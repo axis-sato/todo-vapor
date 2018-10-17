@@ -15,7 +15,7 @@ protocol TodoServiceType {
 
 final class TodoService {
     func retrieveAllTodos(on conn: DatabaseConnectable) -> Future<[Todo]> {
-        return Todo.query(on: conn).all()
+        return Todo.query(on: conn).sort(\.id, .ascending).all()
     }
 }
 
