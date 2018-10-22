@@ -10,16 +10,21 @@ import Vapor
 
 protocol TodoServiceType {
     func retrieveAllTodos(on conn: DatabaseConnectable) -> Future<[Todo]>
+    func retrieveTodo(id: Int, on conn: DatabaseConnectable) -> Future<Todo?>
 }
 
 
-final class TodoService {
+final class TodoService {}
+
+extension TodoService: TodoServiceType {
     func retrieveAllTodos(on conn: DatabaseConnectable) -> Future<[Todo]> {
         return Todo.query(on: conn).sort(\.id, .ascending).all()
     }
+    
+    func retrieveTodo(id: Int, on conn: DatabaseConnectable) -> EventLoopFuture<Todo?> {
+        return Todo.find(id, on: conn)
+    }
 }
-
-extension TodoService: TodoServiceType {}
 
 extension TodoService: ServiceType {
     static var serviceSupports: [Any.Type] {

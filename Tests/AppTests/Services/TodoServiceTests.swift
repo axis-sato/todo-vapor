@@ -36,6 +36,18 @@ final class TodoServiceTests: BaseTestCase {
         XCTAssertTrue(todos[1].done)
     }
     
+    func testRetrieveTodo() throws {
+        prepareTodos()
+        
+        let todo1 = try todoService.retrieveTodo(id: 1, on: conn).wait()
+        XCTAssertEqual("title1", todo1?.title)
+        XCTAssertEqual("detail1", todo1?.detail)
+        
+        let todo2 = try todoService.retrieveTodo(id: 2, on: conn).wait()
+        XCTAssertEqual("title2", todo2?.title)
+        XCTAssertEqual(nil, todo2?.detail)
+    }
+    
     private func prepareTodos() {
         [
             Todo(title: "title1", detail: "detail1"),
