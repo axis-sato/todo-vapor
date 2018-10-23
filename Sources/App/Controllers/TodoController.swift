@@ -7,6 +7,12 @@ final class TodoController {
         let todoService = try req.make(TodoServiceType.self)
         return todoService.retrieveAllTodos(on: req)
     }
+    
+    func showTodo(_ req: Request) throws -> Future<Todo> {
+        let todoService = try req.make(TodoServiceType.self)
+        let id = try req.parameters.next(Int.self)
+        return try todoService.retrieveTodo(id: id, on: req)
+    }
 
     /// Saves a decoded `Todo` to the database.
     func createTodo(_ req: Request) throws -> Future<Todo> {
