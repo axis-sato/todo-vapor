@@ -40,12 +40,16 @@ final class TodoServiceTests: BaseTestCase {
         prepareTodos()
         
         let todo1 = try todoService.retrieveTodo(id: 1, on: conn).wait()
+        XCTAssertEqual(1, todo1.id)
         XCTAssertEqual("title1", todo1.title)
         XCTAssertEqual("detail1", todo1.detail)
+        XCTAssertFalse(todo1.done)
         
         let todo2 = try todoService.retrieveTodo(id: 2, on: conn).wait()
+        XCTAssertEqual(2, todo2.id)
         XCTAssertEqual("title2", todo2.title)
         XCTAssertEqual(nil, todo2.detail)
+        XCTAssertTrue(todo2.done)
     }
     
     func testRetrieveTodo_idが不正な場合例外を投げること() throws {
