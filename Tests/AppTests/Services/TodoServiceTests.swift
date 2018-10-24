@@ -21,24 +21,26 @@ final class TodoServiceTests: BaseTestCase {
     }
 
     func testRetrieveAllTodos() throws {
-        prepareTodos()
+        prepareTodos(on: conn)
 
         let todos = try todoService.retrieveAllTodos(on: conn).wait()
         
         XCTAssertEqual(2, todos.count, "全件取得できること")
         
+        XCTAssertEqual(1, todos[0].id)
         XCTAssertEqual("title1", todos[0].title)
         XCTAssertEqual("detail1", todos[0].detail)
         XCTAssertFalse(todos[0].done)
         
+        XCTAssertEqual(2, todos[1].id)
         XCTAssertEqual("title2", todos[1].title)
         XCTAssertEqual(nil, todos[1].detail)
         XCTAssertTrue(todos[1].done)
     }
     
     func testRetrieveTodo() throws {
-        prepareTodos()
-        
+        prepareTodos(on: conn)
+
         let todo1 = try todoService.retrieveTodo(id: 1, on: conn).wait()
         XCTAssertEqual(1, todo1.id)
         XCTAssertEqual("title1", todo1.title)
@@ -53,20 +55,10 @@ final class TodoServiceTests: BaseTestCase {
     }
     
     func testRetrieveTodo_idが不正な場合例外を投げること() throws {
-        prepareTodos()
+        prepareTodos(on: conn)
 
         XCTAssertThrowsError(try todoService.retrieveTodo(id: 3, on: conn).wait()) { error in
             XCTAssertEqual(error as? CustomError, CustomError.notFoundTodo)
-        }
-    }
-    
-    
-    private func prepareTodos() {
-        [
-            Todo(title: "title1", detail: "detail1"),
-            Todo(title: "title2", done: true)
-            ].forEach { todo in
-                _ = todo.save(on: conn)
         }
     }
 
@@ -75,3 +67,5 @@ final class TodoServiceTests: BaseTestCase {
         conn.close()
     }
 }
+
+extension TodoServiceTests: TodoPreparable {}
