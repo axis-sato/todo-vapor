@@ -7,12 +7,14 @@
 import Vapor
 
 enum CustomError: AbortError {
-    case notFoundTodo
+    case notFoundTodo, todoIdValidationError
     
     var identifier: String {
         switch self {
         case .notFoundTodo:
             return "notFoundTodo"
+        case .todoIdValidationError:
+            return "todoIdValidationError"
         }
     }
 
@@ -20,6 +22,8 @@ enum CustomError: AbortError {
         switch self {
         case .notFoundTodo:
             return .notFound
+        case .todoIdValidationError:
+            return .badRequest
         }
     }
 
@@ -27,6 +31,8 @@ enum CustomError: AbortError {
         switch self {
         case .notFoundTodo:
             return "Todoが見つかりませんでした。"
+        case .todoIdValidationError:
+            return "idの形式が不正です"
         }
     }
     

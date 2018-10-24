@@ -10,7 +10,9 @@ final class TodoController {
     
     func showTodo(_ req: Request) throws -> Future<Todo> {
         let todoService = try req.make(TodoServiceType.self)
-        let id = try req.parameters.next(Int.self)
+        guard let id = try? req.parameters.next(Int.self) else {
+            throw CustomError.todoIdValidationError
+        }
         return try todoService.retrieveTodo(id: id, on: req)
     }
 
