@@ -16,11 +16,16 @@ final class TodoController {
         return try todoService.retrieveTodo(id: id, on: req)
     }
 
-    /// Saves a decoded `Todo` to the database.
-    func createTodo(_ req: Request) throws -> Future<Todo> {
-        return try req.content.decode(Todo.self).flatMap { todo in
-            return todo.save(on: req)
+    func createTodo(_ req: Request, request: TodoRequest) throws -> Future<[Todo]> {
+        let todoService = try req.make(TodoServiceType.self)
+        
+        do {
+            try request.validate()
+        } catch {
+            throw CustomError.todoValidationError
         }
+
+        return try todoService.createTodo(request, on: req)
     }
 
     /// Deletes a parameterized `Todo`.

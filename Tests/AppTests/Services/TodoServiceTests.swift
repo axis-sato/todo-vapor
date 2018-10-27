@@ -61,6 +61,17 @@ final class TodoServiceTests: BaseTestCase {
             XCTAssertEqual(error as? CustomError, CustomError.notFoundTodo)
         }
     }
+    
+    func testCreateTodo() throws {
+        let request = TodoRequest(title: "title1", detail: "detail1", done: false)
+        let todos = try todoService.createTodo(request, on: conn).wait()
+        
+        XCTAssertEqual(1, todos.count)
+        XCTAssertEqual(1, todos[0].id)
+        XCTAssertEqual("title1", todos[0].title)
+        XCTAssertEqual("detail1", todos[0].detail)
+        XCTAssertEqual(false, todos[0].done)
+    }
 
     override func tearDown() {
         super.tearDown()

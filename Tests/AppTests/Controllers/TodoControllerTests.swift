@@ -72,6 +72,31 @@ final class TodoControllerTests: BaseTestCase {
         XCTAssertEqual(errorResponse.code, CustomError.notFoundTodo.code)
         XCTAssertEqual(errorResponse.message, CustomError.notFoundTodo.reason)
     }
+    
+    func testCreateTodo() throws {
+        
+//        let todo = Todo(id: 1, title: "title1", detail: "detail1")
+        let todo = TodoRequest(title: "title1", detail: "detail1", done: false)
+        let response = try app.sendRequest(to: "/todos", method: .POST, body: todo)
+        let todos = try response.content.decode([Todo].self).wait()
+        
+        XCTAssertEqual(1, todos.count)
+        XCTAssertEqual(1, todos[0].id)
+        XCTAssertEqual("title1", todos[0].title)
+        XCTAssertEqual("detail1", todos[0].detail)
+        XCTAssertFalse(todos[0].done)
+    }
+    
+    func testCreateTodo_リクエストbodyが不正な場合status_code400を返すこと() throws {
+
+        let request = TodoRequest(title: "", detail: "detail", done: false)
+        let response = try app.sendRequest(to: "/todos", method: .POST, body: request)
+        let errorResponse = try response.content.decode(CustomErrorMiddleware.ErrorResponse.self).wait()
+        
+        XCTAssertEqual(response.http.status.code, 400)
+        XCTAssertEqual(errorResponse.code, CustomError.todoValidationError.code)
+        XCTAssertEqual(errorResponse.message, CustomError.todoValidationError.reason)
+    }
 }
 
 extension TodoControllerTests: TodoPreparable {}
