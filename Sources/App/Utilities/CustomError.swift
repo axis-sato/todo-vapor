@@ -36,4 +36,13 @@ enum CustomError: AbortError {
         }
     }
     
+    var code: Int {
+        switch self {
+        case .notFoundTodo:
+            return 100
+        case .todoIdValidationError:
+            return 101
+        }
+    }
+    
 }

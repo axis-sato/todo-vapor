@@ -54,7 +54,11 @@ final class TodoControllerTests: BaseTestCase {
         
         let body: EmptyBody? = nil
         let response = try app.sendRequest(to: "/todo/id", method: .GET, body: body)
+        let errorResponse = try response.content.decode(CustomErrorMiddleware.ErrorResponse.self).wait()
+        
         XCTAssertEqual(response.http.status.code, 400)
+        XCTAssertEqual(errorResponse.code, CustomError.todoIdValidationError.code)
+        XCTAssertEqual(errorResponse.message, CustomError.todoIdValidationError.reason)
     }
     
     func testShowTodo_todoが存在しない場合status_code404を返すこと() throws {
@@ -62,7 +66,11 @@ final class TodoControllerTests: BaseTestCase {
         
         let body: EmptyBody? = nil
         let response = try app.sendRequest(to: "/todo/3", method: .GET, body: body)
+        let errorResponse = try response.content.decode(CustomErrorMiddleware.ErrorResponse.self).wait()
+        
         XCTAssertEqual(response.http.status.code, 404)
+        XCTAssertEqual(errorResponse.code, CustomError.notFoundTodo.code)
+        XCTAssertEqual(errorResponse.message, CustomError.notFoundTodo.reason)
     }
 }
 
