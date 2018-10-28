@@ -72,6 +72,29 @@ final class TodoServiceTests: BaseTestCase {
         XCTAssertEqual("detail1", todos[0].detail)
         XCTAssertEqual(false, todos[0].done)
     }
+    
+    func testEditTodo() throws {
+        prepareTodos(on: conn)
+        let request = TodoRequest(title: "title", detail: "detail", done: true)
+        let todos = try todoService.editTodo(request , id: 1, on: conn).wait()
+
+        XCTAssertEqual(2, todos.count)
+
+        let todo = try todoService.retrieveTodo(id: 1, on: conn).wait()
+        XCTAssertEqual(1, todo.id)
+        XCTAssertEqual("title", todo.title)
+        XCTAssertEqual("detail", todo.detail)
+        XCTAssertEqual(true, todo.done)
+    }
+    
+    func testEditTodo_idが不正な場合例外を投げること() throws {
+        prepareTodos(on: conn)
+        
+        let request = TodoRequest(title: "title", detail: "detail", done: true)
+        XCTAssertThrowsError(try todoService.editTodo(request, id: 3, on: conn).wait()) { error in
+            XCTAssertEqual(error as? CustomError, CustomError.notFoundTodo)
+        }
+    }
 
     override func tearDown() {
         super.tearDown()
