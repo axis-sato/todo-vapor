@@ -44,13 +44,15 @@ extension TodoService: TodoServiceType {
     
     func editTodo(_ request: TodoRequest, id: Int, on conn: DatabaseConnectable) throws -> EventLoopFuture<[Todo]> {
         
-        let todo = try retrieveTodo(id: id, on: conn).wait()
-        todo.title = request.title
-        todo.detail = request.detail
-        todo.done = request.done
-        
-        return todo.update(on: conn).flatMap { _ in
-            return self.retrieveAllTodos(on: conn)
+        return try retrieveTodo(id: id, on: conn)
+            .flatMap(to: Todo.self) { todo in
+                todo.title = request.title
+                todo.detail = request.detail
+                todo.done = request.done
+                return todo.update(on: conn)
+            }
+            .flatMap(to: [Todo].self) { _ in
+                return self.retrieveAllTodos(on: conn)
         }
     }
 }

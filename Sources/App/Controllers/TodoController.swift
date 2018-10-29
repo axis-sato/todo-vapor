@@ -28,6 +28,22 @@ final class TodoController {
         return try todoService.createTodo(request, on: req)
     }
 
+    func editTodo(_ req: Request, request: TodoRequest) throws -> Future<[Todo]> {
+        let todoService = try req.make(TodoServiceType.self)
+        
+        guard let id = try? req.parameters.next(Int.self) else {
+            throw CustomError.todoIdValidationError
+        }
+        
+        do {
+            try request.validate()
+        } catch {
+            throw CustomError.todoValidationError
+        }
+        
+        return try todoService.editTodo(request, id: id, on: req)
+    }
+
     /// Deletes a parameterized `Todo`.
     func delete(_ req: Request) throws -> Future<HTTPStatus> {
         return try req.parameters.next(Todo.self).flatMap { todo in
