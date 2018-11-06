@@ -132,6 +132,42 @@ final class TodoControllerTests: BaseTestCase {
         XCTAssertEqual(errorResponse.code, CustomError.notFoundTodo.code)
         XCTAssertEqual(errorResponse.message, CustomError.notFoundTodo.reason)
     }
+    
+    func testDeleteTodo() throws {
+        prepareTodos(on: conn)
+        
+        let body: EmptyBody? = nil
+        let response = try app.sendRequest(to: "/todos/1", method: .DELETE, body: body)
+        let todos = try response.content.decode([Todo].self).wait()
+        
+        XCTAssertEqual(1, todos.count)
+        XCTAssertEqual(2, todos[0].id)
+        XCTAssertEqual("title2", todos[0].title)
+        XCTAssertEqual(nil, todos[0].detail)
+        XCTAssertTrue(todos[0].done)
+    }
+    
+    func testDeleteTodo_リクエストが不正な場合status_code400を返すこと() throws {
+        
+        let body: EmptyBody? = nil
+        let response = try app.sendRequest(to: "/todos/aa", method: .DELETE, body: body)
+        let errorResponse = try response.content.decode(CustomErrorMiddleware.ErrorResponse.self).wait()
+        
+        XCTAssertEqual(response.http.status.code, 400)
+        XCTAssertEqual(errorResponse.code, CustomError.todoIdValidationError.code)
+        XCTAssertEqual(errorResponse.message, CustomError.todoIdValidationError.reason)
+    }
+    
+    func testDeleteTodo_todoが存在しない場合status_code404を返すこと() throws {
+        
+        let body: EmptyBody? = nil
+        let response = try app.sendRequest(to: "/todos/3", method: .DELETE, body: body)
+        let errorResponse = try response.content.decode(CustomErrorMiddleware.ErrorResponse.self).wait()
+        
+        XCTAssertEqual(response.http.status.code, 404)
+        XCTAssertEqual(errorResponse.code, CustomError.notFoundTodo.code)
+        XCTAssertEqual(errorResponse.message, CustomError.notFoundTodo.reason)
+    }
 }
 
 extension TodoControllerTests: TodoPreparable {}

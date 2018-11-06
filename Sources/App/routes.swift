@@ -14,5 +14,6 @@ public func routes(_ router: Router) throws {
     router.post(TodoRequest.self, at: "todos", use: todoController.createTodo)
     router.put(TodoRequest.self, at: "todos", Int.parameter, use: todoController.editTodo)
     
-    router.delete("todos", Todo.parameter, use: todoController.delete)
+    router.delete("todos", Int.parameter, use: todoController.delete)
+//    router.delete("todos", Todo.parameter, use: todoController.delete)
 }

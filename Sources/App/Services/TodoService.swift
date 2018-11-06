@@ -13,6 +13,7 @@ protocol TodoServiceType {
     func retrieveTodo(id: Int, on conn: DatabaseConnectable) throws -> Future<Todo>
     func createTodo(_ request: TodoRequest, on conn: DatabaseConnectable) throws -> Future<[Todo]>
     func editTodo(_ request: TodoRequest, id: Int, on conn: DatabaseConnectable) throws -> Future<[Todo]>
+    func deleteTodo(id: Int, on conn: DatabaseConnectable) throws -> Future<[Todo]>
 }
 
 
@@ -50,6 +51,16 @@ extension TodoService: TodoServiceType {
                 todo.detail = request.detail
                 todo.done = request.done
                 return todo.update(on: conn)
+            }
+            .flatMap(to: [Todo].self) { _ in
+                return self.retrieveAllTodos(on: conn)
+        }
+    }
+    
+    func deleteTodo(id: Int, on conn: DatabaseConnectable) throws -> EventLoopFuture<[Todo]> {
+        return try retrieveTodo(id: id, on: conn)
+            .flatMap { todo in
+                todo.delete(on: conn)
             }
             .flatMap(to: [Todo].self) { _ in
                 return self.retrieveAllTodos(on: conn)

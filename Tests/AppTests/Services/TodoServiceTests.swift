@@ -95,6 +95,25 @@ final class TodoServiceTests: BaseTestCase {
             XCTAssertEqual(error as? CustomError, CustomError.notFoundTodo)
         }
     }
+    
+    func testDeleteTodo() throws {
+        prepareTodos(on: conn)
+        
+        let todos = try todoService.deleteTodo(id: 1, on: conn).wait()
+        XCTAssertEqual(1, todos.count)
+        
+        XCTAssertThrowsError(try todoService.retrieveTodo(id: 1, on: conn).wait() ) { error in
+            XCTAssertEqual(error as? CustomError, CustomError.notFoundTodo)
+        }
+    }
+    
+    func testDeleteTodo_idが不正な場合例外を投げること() throws {
+        prepareTodos(on: conn)
+        
+        XCTAssertThrowsError(try todoService.deleteTodo(id: 3, on: conn).wait()) { error in
+            XCTAssertEqual(error as? CustomError, CustomError.notFoundTodo)
+        }
+    }
 
     override func tearDown() {
         super.tearDown()
