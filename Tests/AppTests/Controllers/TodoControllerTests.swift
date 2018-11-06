@@ -40,7 +40,7 @@ final class TodoControllerTests: BaseTestCase {
         prepareTodos(on: conn)
         
         let body: EmptyBody? = nil
-        let response = try app.sendRequest(to: "/todo/1", method: .GET, body: body)
+        let response = try app.sendRequest(to: "/todos/1", method: .GET, body: body)
         let todo = try response.content.decode(Todo.self).wait()
         
         XCTAssertEqual(1, todo.id)

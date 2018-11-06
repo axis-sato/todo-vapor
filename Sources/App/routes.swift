@@ -10,7 +10,7 @@ public func routes(_ router: Router) throws {
     // Example of configuring a controller
     let todoController = TodoController()
     router.get("todos", use: todoController.showTodos)
-    router.get("todo", Int.parameter, use: todoController.showTodo)
+    router.get("todos", Int.parameter, use: todoController.showTodo)
     router.post(TodoRequest.self, at: "todos", use: todoController.createTodo)
     router.put(TodoRequest.self, at: "todos", Int.parameter, use: todoController.editTodo)
     
